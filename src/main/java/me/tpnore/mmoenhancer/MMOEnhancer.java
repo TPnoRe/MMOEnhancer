@@ -1,89 +1,132 @@
 package me.tpnore.mmoenhancer;
 
-import me.tpnore.mmoenhancer.commands.CommandHandler;
-import me.tpnore.mmoenhancer.database.DatabaseManager;
-import me.tpnore.mmoenhancer.listeners.PlayerEventListener;
+import me.tpnore.mmoenhancer.commands.EnhancerCommandHandler;
+import me.tpnore.mmoenhancer.gui.GUIListener;
+import me.tpnore.mmoenhancer.utils.ConfigManager;
 import me.tpnore.mmoenhancer.utils.Logger;
+import me.tpnore.mmoenhancer.utils.ItemStorageManager;
+import net.Indyuce.MMOItems.MMOItems;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Main plugin class for MMOEnhancer
- * Handles initialization and management of the plugin
+ * MMOItems Utilities Plugin - Similar to Goop
  */
 public class MMOEnhancer extends JavaPlugin {
 
     private static MMOEnhancer instance;
-    private DatabaseManager databaseManager;
     private Logger logger;
+    private ConfigManager configManager;
+    private ItemStorageManager storageManager;
+    private GUIListener guiListener;
+    private MMOItems mmoItems;
 
     @Override
     public void onEnable() {
         instance = this;
         logger = new Logger(this);
         
-        // Log startup
+        logger.info("========================================");
         logger.info("MMOEnhancer v" + getDescription().getVersion() + " is starting...");
+        logger.info("========================================");
         
-        // Initialize database
+        if (!checkDependency("MMOItems")) {
+            logger.error("MMOItems plugin not found!");
+            logger.error("Please install MMOItems to use this plugin.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        
+        mmoItems = (MMOItems) getServer().getPluginManager().getPlugin("MMOItems");
+        logger.info("✓ MMOItems detected!");
+        
+        if (checkDependency("MythicMobs")) {
+            logger.info("✓ MythicMobs detected (optional features enabled)");
+        }
+        if (checkDependency("MMOCore")) {
+            logger.info("✓ MMOCore detected (optional features enabled)");
+        }
+        
         try {
-            databaseManager = new DatabaseManager(this);
-            logger.info("Database initialized successfully!");
+            configManager = new ConfigManager(this);
+            logger.info("✓ Configuration loaded successfully!");
         } catch (Exception e) {
-            logger.error("Failed to initialize database!");
+            logger.error("Failed to load configuration!");
             logger.error(e.getMessage());
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         
-        // Register commands
-        getCommand("mmo").setExecutor(new CommandHandler(this));
-        logger.info("Commands registered!");
+        try {
+            storageManager = new ItemStorageManager(this);
+            logger.info("✓ Storage manager initialized!");
+        } catch (Exception e) {
+            logger.error("Failed to initialize storage manager!");
+            logger.error(e.getMessage());
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         
-        // Register event listeners
-        getServer().getPluginManager().registerEvents(new PlayerEventListener(this), this);
-        logger.info("Event listeners registered!");
+        guiListener = new GUIListener(this);
+        getServer().getPluginManager().registerEvents(guiListener, this);
+        logger.info("✓ GUI listener registered!");
         
-        logger.info("MMOEnhancer enabled successfully! ✓");
+        getCommand("mmoenhancer").setExecutor(new EnhancerCommandHandler(this, guiListener));
+        logger.info("✓ Commands registered!");
+        
+        logger.info("========================================");
+        logger.info("✓ MMOEnhancer enabled successfully!");
+        logger.info("========================================");
     }
 
     @Override
     public void onDisable() {
         logger.info("MMOEnhancer is shutting down...");
-        
-        // Close database connection
-        if (databaseManager != null) {
-            try {
-                databaseManager.close();
-                logger.info("Database connection closed!");
-            } catch (Exception e) {
-                logger.error("Error closing database: " + e.getMessage());
-            }
+        if (configManager != null) {
+            configManager.saveAll();
         }
-        
         logger.info("MMOEnhancer disabled!");
     }
 
     /**
+     * Check if a plugin dependency is available
+     */
+    private boolean checkDependency(String pluginName) {
+        return getServer().getPluginManager().getPlugin(pluginName) != null;
+    }
+
+    /**
      * Get the plugin instance
-     * @return MMOEnhancer plugin instance
      */
     public static MMOEnhancer getInstance() {
         return instance;
     }
 
     /**
-     * Get the database manager
-     * @return DatabaseManager instance
-     */
-    public DatabaseManager getDatabaseManager() {
-        return databaseManager;
-    }
-
-    /**
      * Get the logger
-     * @return Logger instance
      */
     public Logger getPluginLogger() {
         return logger;
+    }
+
+    /**
+     * Get the config manager
+     */
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    /**
+     * Get the storage manager
+     */
+    public ItemStorageManager getStorageManager() {
+        return storageManager;
+    }
+
+    /**
+     * Get MMOItems plugin instance
+     */
+    public MMOItems getMMOItems() {
+        return mmoItems;
     }
 }
