@@ -1,0 +1,23 @@
+name: MMOEnhancer
+version: 0.0.1
+description: MMO Enhancement Plugin for Spigot
+api-version: "1.21"
+main: me.tpnore.mmoenhancer.MMOEnhancer
+authors:
+  - TPnoRe
+website: https://github.com/TPnoRe/MMOEnhancer
+
+commands:
+  mmo:
+    description: Main MMOEnhancer command
+    usage: /mmo <subcommand>
+    aliases:
+      - mmoe
+
+permissions:
+  mmo.admin:
+    description: Admin permission for MMOEnhancer
+    default: op
+  mmo.user:
+    description: User permission for MMOEnhancer
+    default: true
