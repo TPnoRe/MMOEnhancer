@@ -19,9 +19,12 @@ pom.xml.versionsBackup
 pom.xml.orig
 release.properties
 
-# Database
+# Database & Config
 *.db
 *.sqlite
+config.yml
+plugins/
+storage/
 
 # OS
 .DS_Store

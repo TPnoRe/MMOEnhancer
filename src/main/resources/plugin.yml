@@ -1,23 +1,50 @@
 name: MMOEnhancer
 version: 0.0.1
-description: MMO Enhancement Plugin for Spigot
+description: MMOItems Utilities Plugin - Similar to Goop
 api-version: "1.21"
 main: me.tpnore.mmoenhancer.MMOEnhancer
 authors:
   - TPnoRe
 website: https://github.com/TPnoRe/MMOEnhancer
 
+depend:
+  - MMOItems
+soft-depend:
+  - MythicMobs
+  - MMOCore
+
 commands:
-  mmo:
+  mmoenhancer:
     description: Main MMOEnhancer command
-    usage: /mmo <subcommand>
+    usage: /mmoenhancer <subcommand> [args]
     aliases:
       - mmoe
 
 permissions:
-  mmo.admin:
+  mmoenhancer.admin:
     description: Admin permission for MMOEnhancer
     default: op
-  mmo.user:
-    description: User permission for MMOEnhancer
-    default: true
+  mmoenhancer.stat:
+    description: Permission to use stat command
+    default: op
+  mmoenhancer.converter:
+    description: Permission to use converter command
+    default: op
+  mmoenhancer.fixstacks:
+    description: Permission to use fixStacks command
+    default: op
+  mmoenhancer.regenerate:
+    description: Permission to use regenerate command
+    default: op
+  mmoenhancer.modifier:
+    description: Permission to use modifier command
+    default: op
+  mmoenhancer.gemslot:
+    description: Permission to use gem slot command
+    default: op
+  mmoenhancer.tier:
+    description: Permission to use tier command
+    default: op
+  mmoenhancer.gui:
+    description: Permission to use GUI command
+    default: op
